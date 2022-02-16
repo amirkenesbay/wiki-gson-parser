@@ -1,4 +1,4 @@
-package com.amirkenesbay.parser.wiki;
+package com.amirkenesbay.parser.requests;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,23 +7,25 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-public class HttpRequestTest {
-    public static void main(String[] args) {
-        String urlAddress = "https://ru.wikipedia.org/w/api.php?action=query&list=search&utf8=&format=json&srsearch=\"Java\"";
-        HttpURLConnection connection = null;
+public class HttpGetRequest {
+    private final static String URL = "https://ru.wikipedia.org/w/api.php?action=query&list=search&utf8=&format=json&srsearch=\"Java\"";
 
+    public static String getRequest(){
+        return URL;
+    }
+
+    public static String getResponseFromWiki(String urlAddressFromWiki){
+        HttpURLConnection connection = null;
         URL url = null;
         InputStreamReader isR = null;
         BufferedReader bfR = null;
         URLEncoder urlEncoder = null;
-        FileParser fileParser = new FileParser();
-        fileParser.createFile();
         try {
-            url = new URL(urlAddress);
+            url = new URL(urlAddressFromWiki);
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(200);
-            connection.setReadTimeout(200);
+            connection.setConnectTimeout(6 * 10 * 1000);
+            connection.setReadTimeout(6 * 10 * 1000);
             connection.connect();
 
             if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
@@ -31,9 +33,7 @@ public class HttpRequestTest {
                 bfR = new BufferedReader(isR);
                 String line;
                 while ((line = bfR.readLine()) != null) {
-//                    line = URLEncoder.encode(line, StandardCharsets.UTF_8);
-                    fileParser.writeInfoToFile(line);
-                    System.out.println(line);
+                    return line;
                 }
             } else {
                 System.out.printf("Fail %s", connection.getResponseCode());
@@ -52,5 +52,6 @@ public class HttpRequestTest {
                 e.printStackTrace();
             }
         }
+        return null;
     }
 }
